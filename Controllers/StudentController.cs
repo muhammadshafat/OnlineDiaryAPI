@@ -15,7 +15,9 @@ namespace OnlineDiaryAPI.Controllers
             _repo = repo;
         }
 
-        // GET ALL
+        // =========================
+        // GET ALL STUDENTS
+        // =========================
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -23,7 +25,9 @@ namespace OnlineDiaryAPI.Controllers
             return Ok(result);
         }
 
-        // GET BY ID
+        // =========================
+        // GET STUDENT BY ID
+        // =========================
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -31,28 +35,58 @@ namespace OnlineDiaryAPI.Controllers
             return Ok(result);
         }
 
-        // INSERT
+        // =========================
+        // PARENT CHILDREN
+        // =========================
+        [HttpGet("parent-children/{pid}")]
+        public async Task<IActionResult> GetChildren(int pid)
+        {
+            var data = await _repo.GetChildrenByParent(pid);
+            return Ok(data);
+        }
+
+        // =========================
+        // STUDENTS BY CLASS
+        // =========================
+        [HttpGet("class/{cid}")]
+        public async Task<IActionResult> GetStudentsByClass(int cid)
+        {
+            var data = await _repo.GetStudentsByClassAsync(cid);
+
+            if (data == null || !data.Any())
+                return NotFound(new { message = "No students found for this class" });
+
+            return Ok(data);
+        }
+
+        // =========================
+        // ADD STUDENT
+        // =========================
         [HttpPost]
         public async Task<IActionResult> Add(StudentDto dto)
         {
             await _repo.Add(dto);
-            return Ok("Student Added");
+            return Ok(new { message = "Student Added" });
         }
 
-        // UPDATE
+        // =========================
+        // UPDATE STUDENT
+        // =========================
         [HttpPut]
         public async Task<IActionResult> Update(StudentDto dto)
         {
             await _repo.Update(dto);
-            return Ok("Student Updated");
+            return Ok(new { message = "Student Updated" });
         }
 
-        // DELETE
+        // =========================
+        // DELETE STUDENT
+        // =========================
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _repo.Delete(id);
-            return Ok("Student Deleted");
+            return Ok(new { message = "Student Deleted" });
         }
     }
 }

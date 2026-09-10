@@ -32,7 +32,21 @@ namespace OnlineDiaryAPI.Repositories
 
             return await conn.QueryFirstOrDefaultAsync<StudentDto>(sql, new { id });
         }
+        public async Task<IEnumerable<object>> GetChildrenByParent(int pid)
+        {
+            using var conn = _db.CreateConnection();
 
+            string sql = @"
+        SELECT 
+           *
+        FROM Student s
+        INNER JOIN Class c ON s.cid = c.cid
+        WHERE s.pid = @Pid";
+
+            var result = await conn.QueryAsync(sql, new { Pid = pid });
+
+            return result;
+        }
         // INSERT
         public async Task<int> Add(StudentDto s)
         {
@@ -69,6 +83,22 @@ WHERE sid = @sid";
             var sql = "DELETE FROM Student WHERE sid = @id";
 
             return await conn.ExecuteAsync(sql, new { id });
+        }
+        public async Task<IEnumerable<StudentDto>> GetStudentsByClassAsync(int cid)
+        {
+            using var conn = _db.CreateConnection();
+
+            var sql = @"
+        SELECT 
+            sid,
+            sname,
+            password,
+            pid,
+            cid
+        FROM Student
+        WHERE cid = @cid";
+
+            return await conn.QueryAsync<StudentDto>(sql, new { cid });
         }
     }
 }

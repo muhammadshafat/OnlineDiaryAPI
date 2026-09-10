@@ -13,12 +13,12 @@ namespace OnlineDiaryAPI.Repositories
         }
 
         // STUDENT LOGIN
-        public async Task<object> StudentLogin(string name, string password)
+        public async Task<object> PrincipalLogin(string name, string password)
         {
             using var conn = _db.CreateConnection();
 
             string sql =
-                "SELECT sid, sname FROM Student WHERE sname='"
+                "SELECT pid, pname FROM principal WHERE email='"
                 + name + "' AND password='" + password + "'";
 
             return await conn.QueryFirstOrDefaultAsync(sql);

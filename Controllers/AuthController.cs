@@ -15,10 +15,10 @@ namespace OnlineDiaryAPI.Controllers
             _repo = repo;
         }
 
-        [HttpPost("student-login")]
-        public async Task<IActionResult> StudentLogin(LoginDto dto)
+        [HttpPost("principal-login")]
+        public async Task<IActionResult> PrincipalLogin(LoginDto dto)
         {
-            var result = await _repo.StudentLogin(dto.EmailOrName, dto.Password);
+            var result = await _repo.PrincipalLogin(dto.EmailOrName, dto.Password);
 
             if (result == null)
                 return BadRequest("Invalid Login");

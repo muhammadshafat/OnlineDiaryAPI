@@ -41,5 +41,11 @@ namespace OnlineDiaryAPI.Controllers
             await _repo.Delete(id);
             return Ok("Parent Deleted");
         }
+        [HttpGet("parent-children/{pid}")]
+        public async Task<IActionResult> GetParentChildren(int pid)
+        {
+            var data = await _repo.GetParentChildren(pid);
+            return Ok(data);
+        }
     }
 }

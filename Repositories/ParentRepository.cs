@@ -12,7 +12,21 @@ namespace OnlineDiaryAPI.Repositories
         {
             _db = db;
         }
+        public async Task<IEnumerable<object>> GetParentChildren(int pid)
+        {
+            using var conn = _db.CreateConnection();
 
+            string sql = @"
+        SELECT 
+            *
+        FROM Student s
+        INNER JOIN Class c ON s.cid = c.cid
+        WHERE s.pid = @Pid
+    ";
+
+            var result = await conn.QueryAsync(sql, new { Pid = pid });
+            return result;
+        }
         public async Task<IEnumerable<ParentDto>> GetAll()
         {
             using var conn = _db.CreateConnection();

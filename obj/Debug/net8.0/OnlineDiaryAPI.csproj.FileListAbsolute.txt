@@ -426,3 +426,4 @@ c:\Users\Shafat\Desktop\OnlineDiaryAPI\OnlineDiaryAPI\obj\Debug\net8.0\refint\On
 c:\Users\Shafat\Desktop\OnlineDiaryAPI\OnlineDiaryAPI\obj\Debug\net8.0\OnlineDiaryAPI.pdb
 C:\Users\Shafat\Desktop\OnlineDiaryAPI\OnlineDiaryAPI\obj\Debug\net8.0\OnlineDiaryAPI.genruntimeconfig.cache
 C:\Users\Shafat\Desktop\OnlineDiaryAPI\OnlineDiaryAPI\obj\Debug\net8.0\ref\OnlineDiaryAPI.dll
+c:\Users\Shafat\Desktop\OnlineDiaryAPI\OnlineDiaryAPI\obj\Debug\net8.0\OnlineDiaryAPI.sourcelink.json

@@ -1,11 +1,9 @@
-namespace OnlineDiaryAPI.DTOs
+public class UpdateDiaryDto
 {
-    public class UpdateDiaryDto
-    {
-        public int Id { get; set; }
-        public int? Cid { get; set; }
-        public int? Tid { get; set; }
-        public int? Sid { get; set; }
-        public int? Did { get; set; }
-    }
+    public int cid { get; set; }
+    public int tid { get; set; }
+    public int sid { get; set; }
+
+    public string description { get; set; }
+    public string Category { get; set; }
 }
