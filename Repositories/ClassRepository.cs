@@ -18,30 +18,33 @@ namespace OnlineDiaryAPI.Repositories
         {
             using var conn = _db.CreateConnection();
 
-            string sql = "SELECT * FROM Class";
+            const string sql = "SELECT cid AS Cid, cname AS Cname, section AS Section, school_id AS SchoolId FROM Class";
 
             return await conn.QueryAsync<ClassDto>(sql);
         }
 
         // GET BY ID
-        public async Task<ClassDto> GetById(int id)
-        {
-            using var conn = _db.CreateConnection();
+      public async Task<IEnumerable<ClassDto>> GetByschoolId(int id)
+{
+    using var conn = _db.CreateConnection();
 
-            string sql = "SELECT * FROM Class WHERE cid = " + id;
+    const string sql = @"
+        SELECT cid AS Cid, cname AS Cname, section AS Section, school_id AS SchoolId
+        FROM Class
+        WHERE school_id = @Id";
 
-            return await conn.QueryFirstOrDefaultAsync<ClassDto>(sql);
-        }
-
+    return await conn.QueryAsync<ClassDto>(sql, new { Id = id });
+}   
         // INSERT
         public async Task Add(ClassDto dto)
         {
             using var conn = _db.CreateConnection();
 
-            string sql = "INSERT INTO Class (cname, section) VALUES ('" 
-                         + dto.Cname + "', '" + dto.Section + "')";
+            const string sql = @"
+                INSERT INTO Class (cname, section, school_id)
+                VALUES (@Cname, @Section, @SchoolId)";
 
-            await conn.ExecuteAsync(sql);
+            await conn.ExecuteAsync(sql, dto);
         }
 
         // UPDATE
@@ -49,11 +52,12 @@ namespace OnlineDiaryAPI.Repositories
         {
             using var conn = _db.CreateConnection();
 
-            string sql = "UPDATE Class SET cname='" + dto.Cname +
-                         "', section='" + dto.Section +
-                         "' WHERE cid=" + dto.Cid;
+            const string sql = @"
+                UPDATE Class
+                SET cname = @Cname, section = @Section, school_id = COALESCE(@SchoolId, school_id)
+                WHERE cid = @Cid";
 
-            await conn.ExecuteAsync(sql);
+            await conn.ExecuteAsync(sql, dto);
         }
 
         // DELETE

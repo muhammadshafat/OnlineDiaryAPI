@@ -1,11 +1,14 @@
 using Dapper;
+using Microsoft.AspNetCore.Identity;
 using OnlineDiaryAPI.Data;
+using OnlineDiaryAPI.DTOs;
 
 namespace OnlineDiaryAPI.Repositories
 {
     public class AuthRepository
     {
         private readonly SqlConnectionFactory _db;
+        private readonly IPasswordHasher<Tutor> _tutorHasher;
 
         public AuthRepository(SqlConnectionFactory db)
         {
@@ -24,7 +27,17 @@ namespace OnlineDiaryAPI.Repositories
             return await conn.QueryFirstOrDefaultAsync(sql);
         }
 
-        // TEACHER LOGIN
+       public async Task<object?> TutorLogin(string email, string password)
+{ {
+            using var conn = _db.CreateConnection();
+
+            string sql =
+                "SELECT tuid, name FROM tutor WHERE email='"
+                + email + "' AND password='" + password + "'";
+
+            return await conn.QueryFirstOrDefaultAsync(sql);
+        }}
+           // TEACHER LOGIN
         public async Task<object> TeacherLogin(string email, string password)
         {
             using var conn = _db.CreateConnection();

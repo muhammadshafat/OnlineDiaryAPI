@@ -18,7 +18,13 @@ namespace OnlineDiaryAPI.Repositories
         {
             using var conn = _db.CreateConnection();
 
-            string sql = "SELECT * FROM Principal";
+            string sql = @"
+                SELECT pid AS Pid,
+                       pname AS Pname,
+                       password AS Password,
+                       email AS Email,
+                       school AS school
+                FROM Principal";
 
             return await conn.QueryAsync<PrincipalDto>(sql);
         }
@@ -28,9 +34,17 @@ namespace OnlineDiaryAPI.Repositories
         {
             using var conn = _db.CreateConnection();
 
-            string sql = "SELECT * FROM Principal WHERE pid=" + id;
+            string sql = @"
+                SELECT pid AS Pid,
+                       pname AS Pname,
+                       password AS Password,
+                       email AS Email,
+                       school AS school
+                FROM Principal
+                WHERE pid = @Pid";
 
-            return await conn.QueryFirstOrDefaultAsync<PrincipalDto>(sql);
+            return await conn.QueryFirstOrDefaultAsync<PrincipalDto>(
+                sql, new { Pid = id });
         }
 
         // INSERT
@@ -38,13 +52,11 @@ namespace OnlineDiaryAPI.Repositories
         {
             using var conn = _db.CreateConnection();
 
-            string sql =
-                "INSERT INTO Principal (pname, password, email) VALUES ('"
-                + dto.Pname + "', '"
-                + dto.Password + "', '"
-                + dto.Email + "')";
+            string sql = @"
+                INSERT INTO Principal (pname, password, email, school)
+                VALUES (@Pname, @Password, @Email, @school)";
 
-            await conn.ExecuteAsync(sql);
+            await conn.ExecuteAsync(sql, dto);
         }
 
         // UPDATE
@@ -52,13 +64,15 @@ namespace OnlineDiaryAPI.Repositories
         {
             using var conn = _db.CreateConnection();
 
-            string sql =
-                "UPDATE Principal SET pname='" + dto.Pname +
-                "', password='" + dto.Password +
-                "', email='" + dto.Email +
-                "' WHERE pid=" + dto.Pid;
+            string sql = @"
+                UPDATE Principal
+                SET pname = @Pname,
+                    password = @Password,
+                    email = @Email,
+                    school = @school
+                WHERE pid = @Pid";
 
-            await conn.ExecuteAsync(sql);
+            await conn.ExecuteAsync(sql, dto);
         }
 
         // DELETE
@@ -66,9 +80,9 @@ namespace OnlineDiaryAPI.Repositories
         {
             using var conn = _db.CreateConnection();
 
-            string sql = "DELETE FROM Principal WHERE pid=" + id;
+            string sql = "DELETE FROM Principal WHERE pid = @Pid";
 
-            await conn.ExecuteAsync(sql);
+            await conn.ExecuteAsync(sql, new { Pid = id });
         }
     }
 }

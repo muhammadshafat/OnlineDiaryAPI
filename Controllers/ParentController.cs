@@ -19,7 +19,7 @@ namespace OnlineDiaryAPI.Controllers
         public async Task<IActionResult> GetAll() => Ok(await _repo.GetAll());
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id) => Ok(await _repo.GetById(id));
+        public async Task<IActionResult> GetById(string id) => Ok(await _repo.GetById(id));
 
         [HttpPost]
         public async Task<IActionResult> Add(ParentDto dto)
@@ -42,7 +42,7 @@ namespace OnlineDiaryAPI.Controllers
             return Ok("Parent Deleted");
         }
         [HttpGet("parent-children/{pid}")]
-        public async Task<IActionResult> GetParentChildren(int pid)
+        public async Task<IActionResult> GetParentChildren(string pid)
         {
             var data = await _repo.GetParentChildren(pid);
             return Ok(data);

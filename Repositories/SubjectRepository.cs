@@ -65,5 +65,20 @@ namespace OnlineDiaryAPI.Repositories
 
             await conn.ExecuteAsync(sql);
         }
+       public async Task<IEnumerable<SubjectDto>> getSubjectByClass(int id)
+{
+    using var conn = _db.CreateConnection();
+
+    string sql = "SELECT * FROM Subject WHERE cid = @Id";
+    var list = (await conn.QueryAsync<SubjectDto>(sql, new { Id = id })).ToList();
+    if (!list.Any())
+    {
+        string fallbackSql = "SELECT * FROM Subject WHERE cid IS NULL OR cid = 0";
+        var fallback = (await conn.QueryAsync<SubjectDto>(fallbackSql)).ToList();
+        return fallback.Any() ? fallback : await GetAll();
+    }
+    return list;
+}
+
     }
 }

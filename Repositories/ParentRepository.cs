@@ -12,7 +12,7 @@ namespace OnlineDiaryAPI.Repositories
         {
             _db = db;
         }
-        public async Task<IEnumerable<object>> GetParentChildren(int pid)
+        public async Task<IEnumerable<object>> GetParentChildren(string pid)
         {
             using var conn = _db.CreateConnection();
 
@@ -32,27 +32,36 @@ namespace OnlineDiaryAPI.Repositories
             using var conn = _db.CreateConnection();
             return await conn.QueryAsync<ParentDto>("SELECT * FROM Parent");
         }
+public async Task<ParentDto?> GetById(string id)
+{
+    using var conn = _db.CreateConnection();
 
-        public async Task<ParentDto> GetById(int id)
-        {
-            using var conn = _db.CreateConnection();
-            return await conn.QueryFirstOrDefaultAsync<ParentDto>(
-                "SELECT * FROM Parent WHERE pid=" + id);
-        }
+    const string sql = "SELECT * FROM Parent WHERE pid = @Id";
 
-        public async Task Add(ParentDto dto)
-        {
-            using var conn = _db.CreateConnection();
+    return await conn.QueryFirstOrDefaultAsync<ParentDto>(
+        sql,
+        new { Id = id }
+    );
+}
 
-            string sql =
-                "INSERT INTO Parent (pname,email,phoneno,password) VALUES ('"
-                + dto.Pname + "','"
-                + dto.Email + "','"
-                + dto.Phoneno + "','"
-                + dto.Password + "')";
 
-            await conn.ExecuteAsync(sql);
-        }
+public async Task Add(ParentDto dto)
+{
+    using var conn = _db.CreateConnection();
+
+    const string sql = @"
+        INSERT INTO Parent (pid,pname, email, phoneno, password)
+        VALUES (@pid,@Pname, @Email, @Phoneno, @Password);";
+
+    await conn.ExecuteAsync(sql, new
+    {
+        dto.Pid,
+        dto.Pname,
+        dto.Email,
+        dto.Phoneno,
+        dto.Password
+    });
+}
 
         public async Task Update(ParentDto dto)
         {

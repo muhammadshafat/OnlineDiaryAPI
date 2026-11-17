@@ -8,7 +8,7 @@ namespace OnlineDiaryAPI.DTOs
 
         public string Password { get; set; } = "";
 
-        public int? Pid { get; set; }
+        public string Pid { get; set; }
 
         public int? Cid { get; set; }
     }

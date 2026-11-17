@@ -23,12 +23,11 @@ builder.Services.AddScoped<ParentRepository>();
 builder.Services.AddScoped<AuthRepository>();
 builder.Services.AddScoped<UpdateDiaryRepository>();
 builder.Services.AddScoped<PrincipalRepository>();
-
+builder.Services.AddScoped<Tutor_school_requestRepository>();
 // ✅ ADD THIS LINE (IMPORTANT FIX)
 builder.Services.AddScoped<ComplaintRepository, ComplaintRepository>();
-builder.Services.AddScoped<GardenerRepository>();
-builder.Services.AddScoped<GardenRepository>();
-builder.Services.AddScoped<FlowerRepository>();
+
+builder.Services.AddScoped<TutorRepository>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

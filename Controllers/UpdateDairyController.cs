@@ -74,6 +74,13 @@ namespace OnlineDiaryAPI.Controllers
             var data = await _repo.parentViewDiary(sid, category);
             return Ok(data);
         }
+          [HttpGet("view-diary/{tid}")]
+        public async Task<IActionResult> ViewDiary(int tid)
+        {
+            var data = await _repo.ViewDiary(tid);
+            return Ok(data);
+        }
+
         [HttpPost("add-note")]
         public async Task<IActionResult> AddNote([FromBody] StdDiaryDto dto)
         {

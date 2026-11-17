@@ -24,29 +24,43 @@ namespace OnlineDiaryAPI.Repositories
         }
 
         // GET BY ID
-        public async Task<TeacherDto> GetById(int id)
-        {
-            using var conn = _db.CreateConnection();
+    public async Task<TeacherDto?> GetById(int id)
+{
+    using var conn = _db.CreateConnection();
 
-            string sql = "SELECT * FROM Teacher WHERE tid = " + id;
+    const string sql = "SELECT * FROM Teacher WHERE tid = @Id";
 
-            return await conn.QueryFirstOrDefaultAsync<TeacherDto>(sql);
-        }
+    return await conn.QueryFirstOrDefaultAsync<TeacherDto>(
+        sql,
+        new { Id = id }
+    );
+}
+
 
         // INSERT
         public async Task Add(TeacherDto dto)
         {
             using var conn = _db.CreateConnection();
 
-            string sql =
-                "INSERT INTO Teacher (tname, email, phoneno, password, cid) VALUES ('"
-                + dto.Tname + "', '"
-                + dto.Email + "', '"
-                + dto.Phoneno + "', '"
-                + dto.Password + "', "
-                + (dto.Cid ?? 0) + ")";
+        string updateSql = "UPDATE Teacher SET cid = NULL WHERE cid = @Cid";
 
-            await conn.ExecuteAsync(sql);
+            await conn.ExecuteAsync(updateSql, new
+            {
+            Cid = dto.Cid
+            });
+
+            string insertSql = @"
+    INSERT INTO Teacher (tname, email, phoneno, password, cid)
+    VALUES (@Tname, @Email, @Phoneno, @Password, @Cid)";
+
+            await conn.ExecuteAsync(insertSql, new
+{
+    dto.Tname,
+    dto.Email,
+    dto.Phoneno,
+    dto.Password,
+    dto.Cid
+});
         }
 
         // UPDATE

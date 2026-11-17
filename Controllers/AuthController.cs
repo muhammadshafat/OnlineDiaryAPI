@@ -26,6 +26,17 @@ namespace OnlineDiaryAPI.Controllers
             return Ok(result);
         }
 
+        [HttpPost("Tutor-login")]
+        public async Task<IActionResult> TutorLogin(LoginDto dto)
+        {
+            var result = await _repo.TutorLogin(dto.EmailOrName, dto.Password);
+
+            if (result == null)
+                return BadRequest("Invalid Login");
+
+            return Ok(result);
+        }
+
         [HttpPost("teacher-login")]
         public async Task<IActionResult> TeacherLogin(LoginDto dto)
         {

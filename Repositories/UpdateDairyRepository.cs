@@ -22,7 +22,9 @@ namespace OnlineDiaryAPI.Repositories
             string sql = @"
                 SELECT DISTINCT 
                     c.cid AS cid,
-                    c.cname AS cname
+                    c.cname AS cname,
+                    c.section AS section,
+                    c.school_id AS schoolId
                 FROM class c
                 INNER JOIN teaches t ON t.cid = c.cid
                 WHERE t.tid = @Tid";   // ✅ FIXED (closed string)
@@ -78,8 +80,8 @@ namespace OnlineDiaryAPI.Repositories
                 // STEP 1: Insert into Diary
                 string diarySql = @"
             INSERT INTO Diary (ddate, description, category)
-            OUTPUT INSERTED.did
-            VALUES (@Date, @Description, @category);";
+            VALUES (@Date, @Description, @Category);
+            SELECT LAST_INSERT_ID();";
 
                 var did = await conn.ExecuteScalarAsync<int>(diarySql, new
                 {
@@ -127,6 +129,7 @@ namespace OnlineDiaryAPI.Repositories
             d.description,
             d.category,
             c.cname,
+            c.section,
             s.sname
         FROM Diary d
         INNER JOIN UpdateDiary ud ON d.did = ud.did
@@ -163,8 +166,8 @@ INNER JOIN Class c ON ud.cid = c.cid
 INNER JOIN Subject s ON ud.sid = s.sid
 WHERE st.sid = @Sid
   AND d.category = 'Homework'
-  AND d.ddate >= CAST(GETDATE() AS DATE)
-  AND d.ddate < DATEADD(DAY, 1, CAST(GETDATE() AS DATE))
+AND d.ddate >= CURDATE()
+AND d.ddate <  CURDATE() + INTERVAL 1 DAY
 ORDER BY d.ddate DESC;";
 
                 return await conn.QueryAsync(sql, new { Sid = sid });
@@ -178,10 +181,12 @@ ORDER BY d.ddate DESC;";
                 d.description,
                 d.category,
                 s.sname
+                t.tname
             FROM note n
             INNER JOIN diary d ON n.did = d.did
             INNER JOIN UpdateDiary ud ON ud.did = d.did
             INNER JOIN subject s ON s.sid = ud.sid
+            inner JOIN teacher t ON t.tid = ud.tid
             WHERE n.sid = @Sid
               AND d.category = 'Note'
             ORDER BY d.ddate DESC";
@@ -191,73 +196,46 @@ ORDER BY d.ddate DESC;";
 
             return Enumerable.Empty<object>();
         }
-        public async Task<int> AddNoteDiary(StdDiaryDto dto)
+  public async Task<int> AddNoteDiary(StdDiaryDto dto)
+{
+    using var conn = _db.CreateConnection();
+    conn.Open();
+    using var transaction = conn.BeginTransaction();
+
+    try
+    {
+        string diarySql = @"
+            INSERT INTO Diary (ddate, description, category)
+            VALUES (@Date, @Description, @Category);
+            SELECT LAST_INSERT_ID();";
+
+        var did = await conn.ExecuteScalarAsync<int>(
+            diarySql,
+            new { Date = DateTime.Now, dto.Description, dto.Category },
+            transaction);
+
+        if (string.Equals(dto.Category, "note", StringComparison.OrdinalIgnoreCase))
         {
-            using var conn = _db.CreateConnection();
-            conn.Open();
-
-            using var transaction = conn.BeginTransaction();
-
-            try
-            {
-                // Insert into Diary
-                var diarySql = @"
-        INSERT INTO Diary(ddate, description, category)
-        OUTPUT INSERTED.did
-        VALUES(@Date, @Description, @Category); ";
-
-                var did = await conn.ExecuteScalarAsync<int>(
-                    diarySql,
-                    new
-                    {
-                        Date = DateTime.Now,
-                        Description = dto.Description,
-                        Category = dto.Category
-                    },
-                    transaction
-                );
-
-                // Insert into Note
-                var noteSql = @"
-        INSERT INTO Note (tid, sid, did)
-        VALUES (@Tid, @Sid, @Did);";
-
-                await conn.ExecuteAsync(
-                    noteSql,
-                    new
-                    {
-                        Tid = dto.Tid,
-                        Sid = dto.Sid_Student,
-                        Did = did
-                    },
-                    transaction
-                );
-
-                // Insert into UpdateDiary
-                var updateDiarySql = @"
-        INSERT INTO UpdateDiary (cid, tid, sid, did)
-        VALUES (@Cid, @Tid, @Sid, @Did);";
-
-                await conn.ExecuteAsync(
-                    updateDiarySql,
-                    new
-                    {
-                        Cid = dto.Cid,
-                        Tid = dto.Tid,
-                        Sid = dto.Sid,
-                        Did = did
-                    },
-                    transaction
-                );
-
-                transaction.Commit();
-                return did;
-            }
-            catch
-            {
-                transaction.Rollback();
-                throw;
-            }
+            await conn.ExecuteAsync(
+                @"INSERT INTO Note (tid, sid, did) VALUES (@Tid, @Sid, @Did);",
+                new { dto.Tid, Sid = dto.Sid_Student, Did = did },
+                transaction);
         }
+
+        if (string.Equals(dto.Category, "homework", StringComparison.OrdinalIgnoreCase))
+        {
+            await conn.ExecuteAsync(
+                @"INSERT INTO UpdateDiary (cid, tid, sid, did) VALUES (@Cid, @Tid, @Sid, @Did);",
+                new { dto.Cid, dto.Tid, dto.Sid, Did = did },
+                transaction);
+        }
+
+        transaction.Commit();
+        return did;
     }
-}
+    catch
+    {
+        transaction.Rollback();
+        throw;
+    }
+}}}

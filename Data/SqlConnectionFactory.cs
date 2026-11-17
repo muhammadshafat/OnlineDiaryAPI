@@ -1,5 +1,5 @@
+using MySqlConnector;
 using System.Data;
-using Microsoft.Data.SqlClient;
 
 namespace OnlineDiaryAPI.Data
 {
@@ -14,7 +14,7 @@ namespace OnlineDiaryAPI.Data
 
         public IDbConnection CreateConnection()
         {
-            return new SqlConnection(
+            return new MySqlConnection(
                 _config.GetConnectionString("DefaultConnection")
             );
         }

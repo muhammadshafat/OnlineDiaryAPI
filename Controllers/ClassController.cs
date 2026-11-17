@@ -21,10 +21,10 @@ namespace OnlineDiaryAPI.Controllers
             return Ok(await _repo.GetAll());
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        [HttpGet("school/{id}")]
+        public async Task<IActionResult> GetByschoolId(int id)
         {
-            return Ok(await _repo.GetById(id));
+            return Ok(await _repo.GetByschoolId(id));
         }
 
         [HttpPost]

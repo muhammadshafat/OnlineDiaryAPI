@@ -5,5 +5,6 @@ namespace OnlineDiaryAPI.DTOs
         public int Cid { get; set; }
         public string Cname { get; set; }
         public string Section { get; set; }
+        public int? SchoolId { get; set; }
     }
 }

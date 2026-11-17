@@ -27,6 +27,13 @@ namespace OnlineDiaryAPI.Controllers
             return Ok(await _repo.GetById(id));
         }
 
+        [HttpGet("Class/{id}")]
+        
+            public async Task<IActionResult> getSubjectByClass(int id)
+            {
+                return Ok(await _repo.getSubjectByClass(id));
+            }
+        
         [HttpPost]
         public async Task<IActionResult> Add(SubjectDto dto)
         {
